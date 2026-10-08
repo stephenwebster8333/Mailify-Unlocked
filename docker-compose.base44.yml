@@ -1,0 +1,16 @@
+services:
+  preview:
+    image: node:22-slim
+    working_dir: /app/preview
+    volumes:
+      - .:/app:ro
+    command: ["node", "--watch", "server.mjs"]
+    ports:
+      - "3000:3000"
+    restart: on-failure
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/').then(async r=>{if(!r.ok || !(await r.text()).includes('Mock inbox'))process.exit(1)}).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 3s
+      start_period: 10s
+      retries: 3
